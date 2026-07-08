@@ -1,0 +1,53 @@
+{% if success %}
+
+<hr>
+
+<h3>Booking Summary</h3>
+
+<table border="1" cellpadding="8">
+
+    <tr>
+        <th>Facility</th>
+        <td>{{ facility_name }}</td>
+    </tr>
+
+    <tr>
+        <th>Booking Type</th>
+        <td>{{ booking_type }}</td>
+    </tr>
+
+    <tr>
+        <th>Booking Date</th>
+        <td>{{ booking_date }}</td>
+    </tr>
+
+    <tr>
+        <th>Membership Type</th>
+        <td>{{ membership_type }}</td>
+    </tr>
+
+    <tr>
+        <th>Start Time</th>
+        <td>{{ start_time }}</td>
+    </tr>
+
+    <tr>
+        <th>End Time</th>
+        <td>{{ end_time }}</td>
+    </tr>
+
+    <tr>
+        <th>Duration</th>
+        <td>{{ duration }} Hours</td>
+    </tr>
+
+    <tr>
+        <th>Total Amount</th>
+        <td>₹ {{ total_amount }}</td>
+    </tr>
+
+</table>
+
+<br>
+
+{% endif %}

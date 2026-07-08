@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Member Login</h2>
+
+{% if error %}
+<p
+    style="color:#f87171; background: rgba(248, 113, 113, 0.1); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.2);">
+    <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+</p>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Username</label>
+    <input type="text" name="username" required placeholder="Enter your username">
+
+    <label>Password</label>
+    <input type="password" name="password" required placeholder="Enter your password">
+
+    <button type="submit">
+        <i class="fa-solid fa-right-to-bracket"></i> Login
+    </button>
+
+    <p style="text-align: center; margin-top: 1rem; font-size: 0.95rem;">
+        Don't have an account? <a href="/register/" style="color: var(--primary); text-decoration: none;">Register
+            here</a>
+    </p>
+</form>
+
+{% endblock %}

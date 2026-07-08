@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for facility in facilities %}
+<p>
+    {{ facility.name }}
+    | member: ₹{{ facility.member_charge }}
+    | non-member: ₹{{ facility.non_member_charge }}
+</p>
+{% endfor %}
+
+<h2>Book Lounge</h2>
+
+{% if error %}
+<p style="color:red;">
+    {{ error }}
+</p>
+{% endif %}
+
+{% if success %}
+<p style="color:green;">
+    {{ success }}
+</p>
+{% endif %}
+{% if success %}
+
+<hr>
+
+<h3>Booking Summary</h3>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+
+        <th>Name</th>
+
+        <td>{{ name }}</td>
+
+    </tr>
+
+    <tr>
+
+        <th>Mobile</th>
+
+        <td>{{ mobile }}</td>
+
+    </tr>
+
+    <tr>
+
+        <th>Booking Type</th>
+
+        <td>{{ booking_type }}</td>
+
+    </tr>
+
+    <tr>
+
+        <th>Duration</th>
+
+        <td>{{ duration }} Hours</td>
+
+    </tr>
+
+    <tr>
+
+        <th>Membership</th>
+
+        <td>{{ membership_type }}</td>
+
+    </tr>
+    {% if booking_type == "half_day" %}
+
+    <tr>
+        <th>Half Day Slot</th>
+        <td>{{ half_day_slot|title }}</td>
+    </tr>
+
+    {% endif %}
+
+    <tr>
+
+        <th>Total Amount</th>
+
+        <td>₹ {{ total_amount }}</td>
+
+    </tr>
+
+</table>
+
+<br>
+
+{% endif %}
+
+<form method="POST">
+
+    {% csrf_token %}
+    <label>Name:</label>
+    <input type="text" name="name" required>
+
+    <br><br>
+
+    <label>Mobile:</label>
+    <input type="text" name="mobile" maxlength="10" required>
+    <br><br>
+
+    <label>Select Lounge:</label>
+
+    <select name="facility_id" id="facility_id">
+
+        {% for facility in facilities %}
+
+        <option value="{{ facility.id }}">
+            {{ facility.name }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <label>Booking Type:</label>
+
+    <select name="booking_type" id="booking_type" required>
+
+        <option value="hourly">Hourly</option>
+
+        <option value="half_day">Half Day</option>
+
+        <option value="full_day">Full Day</option>
+
+    </select>
+
+    <br><br>
+
+    <!-- Half Day Slot -->
+
+    <div id="half-day-slot" style="display:none;">
+
+        <label>Half Day Slot:</label>
+
+        <select name="half_day_slot">
+
+            <option value="morning">
+                Morning (08:00 AM - 02:00 PM)
+            </option>
+
+            <option value="evening">
+                Evening (03:00 PM - 10:00 PM)
+            </option>
+
+        </select>
+
+        <br><br>
+
+    </div>
+
+    <label>Select Date:</label>
+
+    <input type="date" name="Booking_date" id="Booking_date" value="{{ booking_date|default:'' }}" required>
+
+    <div id="availability-results"
+        style="margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; display: none;"></div>
+
+    <br><br>
+
+    <!-- Time Fields -->
+
+    <div id="time-fields">
+
+        <label>Start Time:</label>
+
+        <input type="time" name="start_time">
+
+        <br><br>
+
+        <label>End Time:</label>
+
+        <input type="time" name="end_time">
+
+        <br><br>
+
+    </div>
+
+    <button type="submit">Book Lounge</button>
+
+</form>
+
+<script>
+
+    const bookingType = document.getElementById("booking_type");
+
+    const halfDaySlot = document.getElementById("half-day-slot");
+
+    const timeFields = document.getElementById("time-fields");
+
+    function toggleFields() {
+
+        if (bookingType.value === "hourly") {
+
+            timeFields.style.display = "block";
+            halfDaySlot.style.display = "none";
+
+        }
+
+        else if (bookingType.value === "half_day") {
+
+            timeFields.style.display = "none";
+            halfDaySlot.style.display = "block";
+
+        }
+
+        else if (bookingType.value === "full_day") {
+
+            timeFields.style.display = "none";
+            halfDaySlot.style.display = "none";
+
+        }
+
+    }
+
+    // Page load par bhi chalega
+    toggleFields();
+
+    // Dropdown change hone par bhi chalega
+    bookingType.addEventListener("change", toggleFields);
+
+</script>
+
+{% endblock %}

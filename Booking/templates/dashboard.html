@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Dashboard</h2>
+<p>Welcome back, {{ user.username }}!</p>
+
+<h3 style="margin-top: 2rem;">Upcoming Bookings</h3>
+{% if upcoming_bookings %}
+<div class="booking-cards" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+    {% for booking in upcoming_bookings %}
+    <div class="content-card" id="booking-{{ booking.id }}" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h4 style="margin-bottom: 0.5rem; color: var(--primary); font-size: 1.3rem;">{{ booking.facility.name }}</h4>
+            <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+            <p><strong>Time:</strong> {{ booking.start_time }} to {{ booking.end_time }}</p>
+            <p><strong>Status:</strong> <span style="color: #34d399; font-weight: 600;">Confirmed</span></p>
+            <p><strong>Amount:</strong> ₹{{ booking.total_amount }}</p>
+        </div>
+        <div>
+            <button onclick="cancelBooking('{{ booking.id }}')" style="background-color: #ef4444; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);">
+                <i class="fa-solid fa-trash"></i> Cancel
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="content-card" style="margin-top: 1.5rem; text-align: center;">
+    <p>You have no upcoming bookings.</p>
+    <br>
+    <a href="/hall/" style="color: var(--primary); text-decoration: underline; font-weight: 600;">Book a facility now</a>
+</div>
+{% endif %}
+
+<script>
+function cancelBooking(bookingId) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this cancellation!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                processCancellation(bookingId);
+            }
+        });
+    } else {
+        if (confirm("Are you sure you want to cancel this booking?")) {
+            processCancellation(bookingId);
+        }
+    }
+}
+
+function processCancellation(bookingId) {
+    fetch(`/cancel_booking/${bookingId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire('Cancelled!', 'Your booking has been cancelled.', 'success').then(() => {
+                    const card = document.getElementById(`booking-${bookingId}`);
+                    card.style.transition = "all 0.5s ease";
+                    card.style.opacity = "0";
+                    card.style.transform = "scale(0.9)";
+                    setTimeout(() => card.remove(), 500);
+                });
+            } else {
+                alert("Booking cancelled successfully.");
+                document.getElementById(`booking-${bookingId}`).remove();
+            }
+        } else {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire('Error', data.error || 'Failed to cancel', 'error');
+            } else {
+                alert(data.error || "Failed to cancel booking.");
+            }
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+</script>
+{% endblock %}

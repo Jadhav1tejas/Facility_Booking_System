@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Create an Account</h2>
+
+{% if error %}
+<p
+    style="color:#f87171; background: rgba(248, 113, 113, 0.1); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.2);">
+    <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+</p>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Username</label>
+    <input type="text" name="username" required placeholder="Choose a username">
+
+    <label>Email Address</label>
+    <input type="email" name="email" required placeholder="Enter your email address">
+
+    <label>Password</label>
+    <input type="password" name="password" required placeholder="Create a password">
+
+    <label>Confirm Password</label>
+    <input type="password" name="confirm_password" required placeholder="Confirm your password">
+
+    <label>Are you a Member?</label>
+    <select name="is_member" required>
+        <option value="False">No, I am a Non-Member</option>
+        <option value="True">Yes, I am a Member</option>
+    </select>
+
+    <button type="submit">
+        <i class="fa-solid fa-user-plus"></i> Register
+    </button>
+
+    <p style="text-align: center; margin-top: 1rem; font-size: 0.95rem;">
+        Already have an account? <a href="/login/" style="color: var(--primary); text-decoration: none;">Login here</a>
+    </p>
+</form>
+
+{% endblock %}

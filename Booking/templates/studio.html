@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for facility in facilities %}
+<p>
+    {{ facility.name }}
+    | member: ₹{{ facility.member_charge }}
+    | non-member: ₹{{ facility.non_member_charge }}
+</p>
+{% endfor %}
+
+<h2>Book Studio</h2>
+{% if error %}
+<p style="color:red;">
+    {{ error }}
+</p>
+
+{% endif %}
+
+{% if success %}
+<p style="color:green;">
+    {{ success }}
+</p>
+{% include 'booking_summary.html' %}
+{% endif %}
+<form method="POST">
+    {% csrf_token %}
+    <label>select Studio:</label>
+    <select name="facility_id" id="facility_id" required>
+        {% for facility in facilities %}
+        <option value="{{ facility.id }}">{{ facility.name }}</option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+    <label>select date:</label>
+    <input type="date" name="Booking_date" id="Booking_date" value="{{ booking_date|default:'' }}" required>
+
+    <div id="availability-results"
+        style="margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; display: none;"></div>
+
+    <br><br>
+    <label>start time:</label>
+    <input type="time" name="start_time" required>
+    <br><br>
+    <label>end time:</label>
+    <input type="time" name="end_time" required>
+    <br><br>
+    <button type="submit">Book Studio</button>
+</form>
+
+{% endblock %}
