@@ -23,10 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&y%n!z8$wg9f-iez-26q42#fq&p!tf@=6#lwvp3is9a_%*yvv8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -76,14 +75,13 @@ WSGI_APPLICATION = 'Facility_Booking.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'facility_booking_db',
+        'NAME': 'railway',
         'USER': 'root',
-        'PASSWORD': 'ROOT@1416',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'PASSWORD': 'ulzPcUbUmvnURURGKlJUiJLwwzQEfdzB',
+        'HOST': 'kodama.proxy.rlwy.net',
+        'PORT': '58686',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -120,11 +118,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'Booking' / 'static',
-]
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 import mimetypes
 mimetypes.add_type("text/css", ".css", True)
 
