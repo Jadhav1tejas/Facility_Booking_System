@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+import os
+import dj_database_url
 
 from pathlib import Path
 
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,15 +75,12 @@ WSGI_APPLICATION = 'Facility_Booking.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+print("MYSQL_URL =", os.getenv("MYSQL_URL"))
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'railway',
-        'USER': 'root',
-        'PASSWORD': 'ulzPcUbUmvnURURGKlJUiJLwwzQEfdzB',
-        'HOST': 'kodama.proxy.rlwy.net',
-        'PORT': '58686',
-    }
+    "default": dj_database_url.config(
+        default=os.getenv('MYSQL_URL'),
+        conn_max_age=600,
+    )
 }
 
 # Password validation
