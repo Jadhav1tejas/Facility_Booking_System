@@ -19,7 +19,7 @@ def base(request):
 @login_required
 def hall_booking(request):
 
-    facilities = Facility.objects.filter(name="Hall")
+    facilities = Facility.objects.filter(name__icontains="Hall")
 
     if request.method == "POST":
 
@@ -201,7 +201,7 @@ def hall_booking(request):
 @login_required
 def studio_booking(request):
 
-    facilities = Facility.objects.filter(name="Studio")
+    facilities = Facility.objects.filter(name__icontains="Studio")
 
     if request.method == "POST":
 
@@ -327,7 +327,7 @@ def studio_booking(request):
 @login_required
 def lounge_booking(request):
 
-    facilities = Facility.objects.filter(name="Lounge")
+    facilities = Facility.objects.filter(name__icontains="Lounge")
 
     if request.method == "POST":
 
@@ -483,7 +483,7 @@ def lounge_booking(request):
 
         free_booking_used = Booking.objects.filter(
 
-            facility__name="Lounge",
+            facility__name__icontains="Lounge",
 
             name=name,
 
@@ -720,9 +720,9 @@ def check_availability(request):
     bookings = Booking.objects.filter(facility_id=facility_id, booking_date=date_str).order_by('start_time')
     
     gap_minutes = 0
-    if facility.name == "Hall":
+    if "hall" in facility.name.lower():
         gap_minutes = 60
-    elif facility.name == "Studio":
+    elif "studio" in facility.name.lower():
         gap_minutes = 30
         
     timeline = []
