@@ -27,10 +27,15 @@
     <input type="password" name="confirm_password" required placeholder="Confirm your password">
 
     <label>Are you a Member?</label>
-    <select name="is_member" required>
+    <select name="is_member" id="is_member" required>
         <option value="False">No, I am a Non-Member</option>
         <option value="True">Yes, I am a Member</option>
     </select>
+
+    <div id="member_id_container" style="display: none; margin-top: 1rem;">
+        <label>Enter Member ID</label>
+        <input type="text" name="member_id" id="member_id" placeholder="Ask your admin for this ID">
+    </div>
 
     <button type="submit">
         <i class="fa-solid fa-user-plus"></i> Register
@@ -40,5 +45,20 @@
         Already have an account? <a href="/login/" style="color: var(--primary); text-decoration: none;">Login here</a>
     </p>
 </form>
+
+<script>
+    document.getElementById('is_member').addEventListener('change', function() {
+        var container = document.getElementById('member_id_container');
+        var input = document.getElementById('member_id');
+        if (this.value === 'True') {
+            container.style.display = 'block';
+            input.required = true;
+        } else {
+            container.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
+    });
+</script>
 
 {% endblock %}

@@ -3,7 +3,7 @@ from tracemalloc import start
 from urllib import request
 from .utils import calculate_duration
 from django.shortcuts import render
-from .models import Booking, Facility, UserProfile
+from .models import Booking, Facility, UserProfile, MemberID
 from decimal import Decimal
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -708,15 +708,29 @@ def register_user(request):
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
         is_member_value = request.POST.get("is_member") == "True"
+        member_id_input = request.POST.get("member_id")
 
         if password != confirm_password:
             return render(request, "register.html", {"error": "Passwords do not match."})
 
         if User.objects.filter(username=username).exists():
             return render(request, "register.html", {"error": "Username is already taken."})
+            
+        if is_member_value:
+            if not member_id_input:
+                return render(request, "register.html", {"error": "Member ID is required for members."})
+            
+            try:
+                member_record = MemberID.objects.get(member_id=member_id_input, is_used=False)
+            except MemberID.DoesNotExist:
+                return render(request, "register.html", {"error": "Invalid or already used Member ID."})
 
         user = User.objects.create_user(username=username, email=email, password=password)
         user.save()
+        
+        if is_member_value:
+            member_record.is_used = True
+            member_record.save()
         
         # Create the UserProfile with membership status
         UserProfile.objects.create(user=user, is_member=is_member_value)

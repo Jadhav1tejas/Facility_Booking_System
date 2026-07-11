@@ -9,6 +9,13 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - Member: {self.is_member}"
 
+class MemberID(models.Model):
+    member_id = models.CharField(max_length=50, unique=True)
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.member_id} - Used: {self.is_used}"
+
 class Facility(models.Model):
     name = models.CharField(max_length=100)
     member_charge = models.DecimalField(max_digits=10, decimal_places=2,default=0.00)

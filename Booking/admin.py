@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Facility, Booking, UserProfile
+from .models import Facility, Booking, UserProfile, MemberID
 
 
 @admin.register(Facility)
@@ -44,3 +44,9 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'is_member')
     list_filter = ('is_member',)
     search_fields = ('user__username', 'user__email')
+
+@admin.register(MemberID)
+class MemberIDAdmin(admin.ModelAdmin):
+    list_display = ('member_id', 'is_used')
+    list_filter = ('is_used',)
+    search_fields = ('member_id',)
