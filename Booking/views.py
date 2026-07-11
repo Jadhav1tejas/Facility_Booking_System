@@ -800,17 +800,25 @@ def check_availability(request):
 
 @login_required
 def dashboard(request):
-    upcoming_bookings = Booking.objects.filter(
-        user=request.user,
-        booking_date__gte=datetime.today().date()
-    ).order_by('booking_date', 'start_time')
+    if request.user.is_staff or request.user.is_superuser:
+        upcoming_bookings = Booking.objects.filter(
+            booking_date__gte=datetime.today().date()
+        ).order_by('booking_date', 'start_time')
+    else:
+        upcoming_bookings = Booking.objects.filter(
+            user=request.user,
+            booking_date__gte=datetime.today().date()
+        ).order_by('booking_date', 'start_time')
     return render(request, "dashboard.html", {"upcoming_bookings": upcoming_bookings})
 
 @login_required
 def cancel_booking(request, booking_id):
     if request.method == "POST":
         try:
-            booking = Booking.objects.get(id=booking_id, user=request.user)
+            if request.user.is_staff or request.user.is_superuser:
+                booking = Booking.objects.get(id=booking_id)
+            else:
+                booking = Booking.objects.get(id=booking_id, user=request.user)
             booking.delete()
             return JsonResponse({"success": True})
         except Booking.DoesNotExist:
