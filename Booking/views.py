@@ -41,6 +41,10 @@ def hall_booking(request):
             parsed_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
             if parsed_date < datetime.today().date():
                 return render(request, "hall.html", {"facilities": facilities, "error": "Cannot book for a past date.", "booking_date": booking_date})
+            if parsed_date == datetime.today().date():
+                parsed_time = datetime.strptime(start_time, "%H:%M").time()
+                if parsed_time < datetime.now().time():
+                    return render(request, "hall.html", {"facilities": facilities, "error": "Cannot book for a past time today.", "booking_date": booking_date})
         except (ValueError, TypeError):
             return render(request, "hall.html", {"facilities": facilities, "error": "Invalid date format. Please use YYYY-MM-DD.", "booking_date": booking_date})
             
@@ -220,6 +224,10 @@ def studio_booking(request):
             parsed_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
             if parsed_date < datetime.today().date():
                 return render(request, "studio.html", {"facilities": facilities, "error": "Cannot book for a past date.", "booking_date": booking_date})
+            if parsed_date == datetime.today().date():
+                parsed_time = datetime.strptime(start_time, "%H:%M").time()
+                if parsed_time < datetime.now().time():
+                    return render(request, "studio.html", {"facilities": facilities, "error": "Cannot book for a past time today.", "booking_date": booking_date})
         except (ValueError, TypeError):
             return render(request, "studio.html", {"facilities": facilities, "error": "Invalid date format. Please use YYYY-MM-DD.", "booking_date": booking_date})
             
@@ -356,6 +364,10 @@ def lounge_booking(request):
             parsed_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
             if parsed_date < datetime.today().date():
                 return render(request, "lounge.html", {"facilities": facilities, "error": "Cannot book for a past date.", "booking_date": booking_date})
+            if parsed_date == datetime.today().date() and booking_type == "hourly":
+                parsed_time = datetime.strptime(start_time, "%H:%M").time()
+                if parsed_time < datetime.now().time():
+                    return render(request, "lounge.html", {"facilities": facilities, "error": "Cannot book for a past time today.", "booking_date": booking_date})
         except (ValueError, TypeError):
             return render(request, "lounge.html", {"facilities": facilities, "error": "Invalid date format. Please use YYYY-MM-DD.", "booking_date": booking_date})
 
@@ -734,13 +746,24 @@ def check_availability(request):
         gap_minutes = 30
         
     timeline = []
-    today_date = datetime.today()
-    current_time = datetime.combine(today_date, datetime.strptime("08:00", "%H:%M").time())
-    end_of_day = datetime.combine(today_date, datetime.strptime("22:00", "%H:%M").time())
     
+    try:
+        parsed_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+        
+    today_date = datetime.today().date()
+    current_time = datetime.combine(parsed_date, datetime.strptime("08:00", "%H:%M").time())
+    end_of_day = datetime.combine(parsed_date, datetime.strptime("22:00", "%H:%M").time())
+    
+    if parsed_date == today_date:
+        now = datetime.now()
+        if now > current_time:
+            current_time = now
+
     for b in bookings:
-        b_start = datetime.combine(today_date, b.start_time)
-        b_end = datetime.combine(today_date, b.end_time)
+        b_start = datetime.combine(parsed_date, b.start_time)
+        b_end = datetime.combine(parsed_date, b.end_time)
         
         buffer_start = b_start - timedelta(minutes=gap_minutes) if gap_minutes > 0 else b_start
         
