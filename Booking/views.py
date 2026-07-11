@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.utils import timezone
 
 # Create your views here.
 @login_required
@@ -39,11 +40,11 @@ def hall_booking(request):
         # -----------------------
         try:
             parsed_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
-            if parsed_date < datetime.today().date():
+            if parsed_date < timezone.localtime().date():
                 return render(request, "hall.html", {"facilities": facilities, "error": "Cannot book for a past date.", "booking_date": booking_date})
-            if parsed_date == datetime.today().date():
+            if parsed_date == timezone.localtime().date():
                 parsed_time = datetime.strptime(start_time, "%H:%M").time()
-                if parsed_time < datetime.now().time():
+                if parsed_time < timezone.localtime().time():
                     return render(request, "hall.html", {"facilities": facilities, "error": "Cannot book for a past time today.", "booking_date": booking_date})
         except (ValueError, TypeError):
             return render(request, "hall.html", {"facilities": facilities, "error": "Invalid date format. Please use YYYY-MM-DD.", "booking_date": booking_date})
@@ -222,11 +223,11 @@ def studio_booking(request):
 
         try:
             parsed_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
-            if parsed_date < datetime.today().date():
+            if parsed_date < timezone.localtime().date():
                 return render(request, "studio.html", {"facilities": facilities, "error": "Cannot book for a past date.", "booking_date": booking_date})
-            if parsed_date == datetime.today().date():
+            if parsed_date == timezone.localtime().date():
                 parsed_time = datetime.strptime(start_time, "%H:%M").time()
-                if parsed_time < datetime.now().time():
+                if parsed_time < timezone.localtime().time():
                     return render(request, "studio.html", {"facilities": facilities, "error": "Cannot book for a past time today.", "booking_date": booking_date})
         except (ValueError, TypeError):
             return render(request, "studio.html", {"facilities": facilities, "error": "Invalid date format. Please use YYYY-MM-DD.", "booking_date": booking_date})
@@ -362,11 +363,11 @@ def lounge_booking(request):
 
         try:
             parsed_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
-            if parsed_date < datetime.today().date():
+            if parsed_date < timezone.localtime().date():
                 return render(request, "lounge.html", {"facilities": facilities, "error": "Cannot book for a past date.", "booking_date": booking_date})
-            if parsed_date == datetime.today().date() and booking_type == "hourly":
+            if parsed_date == timezone.localtime().date() and booking_type == "hourly":
                 parsed_time = datetime.strptime(start_time, "%H:%M").time()
-                if parsed_time < datetime.now().time():
+                if parsed_time < timezone.localtime().time():
                     return render(request, "lounge.html", {"facilities": facilities, "error": "Cannot book for a past time today.", "booking_date": booking_date})
         except (ValueError, TypeError):
             return render(request, "lounge.html", {"facilities": facilities, "error": "Invalid date format. Please use YYYY-MM-DD.", "booking_date": booking_date})
@@ -766,12 +767,12 @@ def check_availability(request):
     except ValueError:
         return JsonResponse({'error': 'Invalid date format'}, status=400)
         
-    today_date = datetime.today().date()
+    today_date = timezone.localtime().date()
     current_time = datetime.combine(parsed_date, datetime.strptime("08:00", "%H:%M").time())
     end_of_day = datetime.combine(parsed_date, datetime.strptime("22:00", "%H:%M").time())
     
     if parsed_date == today_date:
-        now = datetime.now()
+        now = timezone.localtime().replace(tzinfo=None)
         if now > current_time:
             current_time = now
 
@@ -847,12 +848,12 @@ def check_availability(request):
 def dashboard(request):
     if request.user.is_staff or request.user.is_superuser:
         upcoming_bookings = Booking.objects.filter(
-            booking_date__gte=datetime.today().date()
+            booking_date__gte=timezone.localtime().date()
         ).order_by('booking_date', 'start_time')
     else:
         upcoming_bookings = Booking.objects.filter(
             user=request.user,
-            booking_date__gte=datetime.today().date()
+            booking_date__gte=timezone.localtime().date()
         ).order_by('booking_date', 'start_time')
     return render(request, "dashboard.html", {"upcoming_bookings": upcoming_bookings})
 
