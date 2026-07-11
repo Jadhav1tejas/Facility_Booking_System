@@ -31,6 +31,8 @@ def hall_booking(request):
         booking_date = request.POST.get("Booking_date")
         start_time = request.POST.get("start_time")
         end_time = request.POST.get("end_time")
+        name = request.POST.get("name")
+        mobile = request.POST.get("mobile")
 
         # -----------------------
         # Validations (Date/Time)
@@ -164,7 +166,8 @@ def hall_booking(request):
             membership_type=membership_type,
 
             total_amount=total_amount,
-            
+            name=name,
+            mobile=mobile,
             user=request.user
 
         )
@@ -210,6 +213,8 @@ def studio_booking(request):
         booking_date = request.POST.get("Booking_date")
         start_time = request.POST.get("start_time")
         end_time = request.POST.get("end_time")
+        name = request.POST.get("name")
+        mobile = request.POST.get("mobile")
 
         try:
             parsed_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
@@ -295,7 +300,10 @@ def studio_booking(request):
             end_time=end_time,  
             booking_type="hourly",
             membership_type=membership_type,
-            total_amount=total_amount
+            total_amount=total_amount,
+            name=name,
+            mobile=mobile,
+            user=request.user
         )
 
         return render(

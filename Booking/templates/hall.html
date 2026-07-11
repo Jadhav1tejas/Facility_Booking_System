@@ -22,6 +22,12 @@
 {% endif %}
 <form method="POST">
     {% csrf_token %}
+    <label>Name:</label>
+    <input type="text" name="name" required>
+    <br><br>
+    <label>Mobile:</label>
+    <input type="text" name="mobile" required>
+    <br><br>
     <label>select hall:</label>
     <select name="facility_id" id="facility_id" required>
         {% for facility in facilities %}
