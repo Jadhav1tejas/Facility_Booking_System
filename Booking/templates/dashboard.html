@@ -104,32 +104,41 @@
 function cancelBooking(bookingId) {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this cancellation!",
+            title: 'Cancel Booking',
+            text: "Please tell us why you are cancelling this booking:",
+            input: 'textarea',
+            inputPlaceholder: 'Type your reason here...',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Yes, cancel it!'
+            confirmButtonText: 'Yes, cancel it!',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write a reason to cancel!'
+                }
+            }
         }).then((result) => {
             if (result.isConfirmed) {
-                processCancellation(bookingId);
+                processCancellation(bookingId, result.value);
             }
         });
     } else {
-        if (confirm("Are you sure you want to cancel this booking?")) {
-            processCancellation(bookingId);
+        var reason = prompt("Please tell us why you are cancelling this booking:");
+        if (reason) {
+            processCancellation(bookingId, reason);
         }
     }
 }
 
-function processCancellation(bookingId) {
+function processCancellation(bookingId, reason) {
     fetch(`/cancel_booking/${bookingId}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ reason: reason })
     })
     .then(response => response.json())
     .then(data => {

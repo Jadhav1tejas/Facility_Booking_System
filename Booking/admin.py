@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Facility, Booking, UserProfile, MemberID
+from .models import Facility, Booking, UserProfile, MemberID, CancellationLog
 
 
 @admin.register(Facility)

@@ -90,3 +90,13 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.facility.name} - {self.booking_date}"
+
+class CancellationLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    facility_name = models.CharField(max_length=100)
+    booking_date = models.DateField()
+    reason = models.TextField()
+    cancelled_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Cancelled: {self.facility_name} on {self.booking_date}"

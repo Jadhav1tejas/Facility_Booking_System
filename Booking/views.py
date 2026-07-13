@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
+import json
 
 # Create your views here.
 @login_required
@@ -897,10 +898,24 @@ def get_bookings_api(request):
 def cancel_booking(request, booking_id):
     if request.method == "POST":
         try:
+            try:
+                data = json.loads(request.body)
+                reason = data.get("reason", "No reason provided")
+            except:
+                reason = "No reason provided"
+
             if request.user.is_staff or request.user.is_superuser:
                 booking = Booking.objects.get(id=booking_id)
             else:
                 booking = Booking.objects.get(id=booking_id, user=request.user)
+                
+            from .models import CancellationLog
+            CancellationLog.objects.create(
+                user=booking.user,
+                facility_name=booking.facility.name,
+                booking_date=booking.booking_date,
+                reason=reason
+            )
             booking.delete()
             return JsonResponse({"success": True})
         except Booking.DoesNotExist:
