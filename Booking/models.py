@@ -79,7 +79,7 @@ class Booking(models.Model):
     )
 
     mobile = models.CharField(
-        max_length=10,
+        max_length=25,
         blank=True,
         null=True
     )
