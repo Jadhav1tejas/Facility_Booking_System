@@ -29,7 +29,7 @@
     <input type="text" name="name" required>
     <br><br>
     <label>Mobile:</label>
-    <input type="text" name="mobile" required>
+    <input type="text" name="mobile" minlength="10" maxlength="10" pattern="[0-9]{10}" title="Enter exactly 10 digits" required>
     <br><br>
     <label>select Studio:</label>
     <select name="facility_id" id="facility_id" required>
