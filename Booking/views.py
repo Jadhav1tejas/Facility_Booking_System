@@ -858,6 +858,42 @@ def dashboard(request):
     return render(request, "dashboard.html", {"upcoming_bookings": upcoming_bookings})
 
 @login_required
+def get_bookings_api(request):
+    if request.user.is_staff or request.user.is_superuser:
+        bookings = Booking.objects.all()
+    else:
+        bookings = Booking.objects.filter(user=request.user)
+
+    events = []
+    for b in bookings:
+        start_dt = datetime.combine(b.booking_date, b.start_time).isoformat()
+        end_dt = datetime.combine(b.booking_date, b.end_time).isoformat()
+        
+        color = '#3b82f6' # Blue default
+        if 'studio' in b.facility.name.lower():
+            color = '#8b5cf6' # Purple
+        elif 'lounge' in b.facility.name.lower():
+            color = '#10b981' # Green
+
+        events.append({
+            'id': b.id,
+            'title': f"{b.facility.name} - {b.user.username if b.user else b.name or 'Guest'}",
+            'start': start_dt,
+            'end': end_dt,
+            'backgroundColor': color,
+            'borderColor': color,
+            'extendedProps': {
+                'facility': b.facility.name,
+                'user': b.user.username if b.user else b.name or 'Guest',
+                'amount': float(b.total_amount),
+                'type': b.booking_type,
+                'mobile': b.mobile or 'N/A'
+            }
+        })
+
+    return JsonResponse(events, safe=False)
+
+@login_required
 def cancel_booking(request, booking_id):
     if request.method == "POST":
         try:

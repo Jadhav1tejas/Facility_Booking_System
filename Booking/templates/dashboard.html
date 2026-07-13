@@ -4,6 +4,70 @@
 <p>Welcome back, {{ user.username }}!</p>
 
 <h3 style="margin-top: 2rem;">Upcoming Bookings</h3>
+
+{% if user.is_staff or user.is_superuser %}
+<h3 style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">Admin Calendar View</h3>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">View all bookings by Month, Week, or Day.</p>
+<div id='calendar' style="margin-top: 1rem; padding: 1.5rem; background: var(--surface); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.05);"></div>
+
+<!-- FullCalendar Libraries -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      events: '/api/bookings/',
+      eventClick: function(info) {
+        var props = info.event.extendedProps;
+        var start_str = info.event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        var end_str = info.event.end ? info.event.end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+        
+        var details = `
+            <div style="text-align: left; padding: 10px;">
+                <b>Time:</b> ${start_str} - ${end_str}<br><br>
+                <b>Booked By:</b> ${props.user}<br>
+                <b>Mobile:</b> ${props.mobile}<br>
+                <b>Type:</b> ${props.type}<br>
+                <b>Amount:</b> ₹${props.amount}
+            </div>
+        `;
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: info.event.title,
+                html: details,
+                icon: 'info',
+                confirmButtonColor: '#3b82f6'
+            });
+        } else {
+            alert(info.event.title + "\nUser: " + props.user + "\nMobile: " + props.mobile);
+        }
+      }
+    });
+    calendar.render();
+  });
+</script>
+
+<style>
+/* Dark theme adjustments for FullCalendar */
+.fc-theme-standard .fc-scrollgrid { border-color: rgba(255, 255, 255, 0.1); }
+.fc-theme-standard td, .fc-theme-standard th { border-color: rgba(255, 255, 255, 0.1); }
+.fc .fc-toolbar-title { color: var(--text-primary); font-size: 1.5em; }
+.fc .fc-button-primary { background-color: var(--primary); border-color: var(--primary); }
+.fc .fc-button-primary:not(:disabled):active, .fc .fc-button-primary:not(:disabled).fc-button-active { background-color: #2563eb; border-color: #2563eb; }
+.fc-daygrid-day-number, .fc-col-header-cell-cushion { color: var(--text-primary); text-decoration: none; padding: 5px; }
+.fc-event { cursor: pointer; padding: 2px 4px; }
+.fc-day-today { background: rgba(59, 130, 246, 0.1) !important; }
+.fc-list-event:hover td { background-color: rgba(255, 255, 255, 0.05); }
+</style>
+<br><hr style="border-color: rgba(255,255,255,0.1);"><br>
+{% endif %}
 {% if upcoming_bookings %}
 <div class="booking-cards" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
     {% for booking in upcoming_bookings %}

@@ -6,6 +6,7 @@ urlpatterns = [
     path('hall/', views.hall_booking, name='hall'),
     path('studio/', views.studio_booking, name='studio'),
     path('lounge/', views.lounge_booking, name='lounge'),
+    path('api/bookings/', views.get_bookings_api, name='get_bookings_api'),
     path("login/", views.login_user, name="login"),
     path("logout/", views.logout_user, name="logout"),
     path("register/", views.register_user, name="register"),
