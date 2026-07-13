@@ -43,11 +43,11 @@
         style="margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; display: none;"></div>
 
     <br><br>
-    <label>start time:</label>
-    <input type="time" name="start_time" required>
+    <label>start time (8am to 10pm):</label>
+    <input type="time" name="start_time" min="08:00" max="22:00" title="Booking only allowed between 8 AM and 10 PM" required>
     <br><br>
-    <label>end time:</label>
-    <input type="time" name="end_time" required>
+    <label>end time (8am to 10pm):</label>
+    <input type="time" name="end_time" min="08:00" max="22:00" title="Booking only allowed between 8 AM and 10 PM" required>
     <br><br>
     <button type="submit">Book Hall</button>
 </form>

@@ -169,17 +169,12 @@
 
     <div id="time-fields">
 
-        <label>Start Time:</label>
-
-        <input type="time" name="start_time">
-
+        <label>Start Time (8am to 10pm):</label>
+        <input type="time" name="start_time" id="start_time" min="08:00" max="22:00" title="Booking only allowed between 8 AM and 10 PM" required>
         <br><br>
 
-        <label>End Time:</label>
-
-        <input type="time" name="end_time">
-
-        <br><br>
+        <label>End Time (8am to 10pm):</label>
+        <input type="time" name="end_time" id="end_time" min="08:00" max="22:00" title="Booking only allowed between 8 AM and 10 PM" required><br>
 
     </div>
 
