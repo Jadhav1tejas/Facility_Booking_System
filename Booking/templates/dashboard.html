@@ -10,6 +10,13 @@
 <p style="color: var(--text-secondary); margin-bottom: 1rem;">View all bookings by Month, Week, or Day.</p>
 <div id='calendar' style="margin-top: 1rem; padding: 1.5rem; background: var(--surface); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.05);"></div>
 
+<div id="daily-bookings-section" style="margin-top: 2rem; display: none;">
+    <h3 id="daily-bookings-title" style="color: var(--primary); margin-bottom: 1rem;">Bookings for Selected Date</h3>
+    <div id="daily-bookings-list" class="booking-cards" style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Daily bookings will be injected here via JavaScript -->
+    </div>
+</div>
+
 <!-- FullCalendar Libraries -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
@@ -23,10 +30,69 @@
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
-      navLinks: true, // click on day/week names to navigate views
+      navLinks: false, 
       slotMinTime: '08:00:00',
       slotMaxTime: '22:00:00',
       events: '/api/bookings/',
+      dateClick: function(info) {
+        // Highlight clicked date
+        document.querySelectorAll('.fc-daygrid-day').forEach(el => {
+            el.style.backgroundColor = '';
+        });
+        info.dayEl.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+
+        var clickedDateStr = info.dateStr; // Format: YYYY-MM-DD
+        
+        // Get all events
+        var allEvents = calendar.getEvents();
+        var dailyEvents = allEvents.filter(event => {
+            var eventDateStr = event.start.toISOString().split('T')[0];
+            return eventDateStr === clickedDateStr;
+        });
+
+        // Render below calendar
+        var listContainer = document.getElementById('daily-bookings-list');
+        var section = document.getElementById('daily-bookings-section');
+        var title = document.getElementById('daily-bookings-title');
+        
+        // Format date for title (e.g., "July 11, 2026")
+        var dateObj = new Date(clickedDateStr);
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        title.innerText = `Bookings for ${dateObj.toLocaleDateString(undefined, options)}`;
+        
+        listContainer.innerHTML = '';
+        
+        if (dailyEvents.length === 0) {
+            listContainer.innerHTML = `<div class="content-card" style="padding: 1.5rem; text-align: center;"><p>No bookings for this date.</p></div>`;
+        } else {
+            // Sort by start time
+            dailyEvents.sort((a, b) => a.start - b.start);
+
+            dailyEvents.forEach(event => {
+                var props = event.extendedProps;
+                var start_str = event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                var end_str = event.end ? event.end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                
+                var cardHtml = `
+                <div class="content-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid ${event.backgroundColor};">
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1.2rem;">${props.facility}</h4>
+                        <p><strong>Time:</strong> ${start_str} to ${end_str}</p>
+                        <p><strong>Booked By:</strong> ${props.user}</p>
+                        <p><strong>Mobile:</strong> ${props.mobile}</p>
+                        <p><strong>Amount:</strong> ₹${props.amount}</p>
+                    </div>
+                </div>
+                `;
+                listContainer.innerHTML += cardHtml;
+            });
+        }
+        
+        section.style.display = 'block';
+        
+        // Smooth scroll to the section
+        section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      },
       eventClick: function(info) {
         var props = info.event.extendedProps;
         var start_str = info.event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
