@@ -75,7 +75,7 @@
         <div>
             <h4 style="margin-bottom: 0.5rem; color: var(--primary); font-size: 1.3rem;">{{ booking.facility.name }}</h4>
             <p><strong>Date:</strong> {{ booking.booking_date }}</p>
-            <p><strong>Time:</strong> {{ booking.start_time }} to {{ booking.end_time }}</p>
+            <p><strong>Time:</strong> {{ booking.start_time|time:"h:i A" }} to {{ booking.end_time|time:"h:i A" }}</p>
             {% if user.is_staff or user.is_superuser %}
             <p><strong>Booked By:</strong> {{ booking.user.username|default:"Guest" }}</p>
             {% endif %}
